@@ -33,6 +33,8 @@ function isBinary(n) {
 
 //Напишите функцию, которая находит N-е число Фибоначчи
 function fibonacci(n) {
+    if (n === 1 || n === 2) return 1;
+
     let first = 1;
     let second = 1;
     for (let i = 3; i <= n; ++i) {
@@ -40,7 +42,8 @@ function fibonacci(n) {
         first = second;
         second = second + tmp;
     }
-    return n === 1 ? 1 : n === 2 ? 1 : second;
+
+    return second;
 }
 
 /** Напишите функцию, которая принимает начальное значение и функцию операции
@@ -55,14 +58,14 @@ function fibonacci(n) {
  * console.log(sumFn(3)) - 18
  */
 function getOperationFn(initialValue, operatorFn) {
-    this.initialValue = initialValue;
+    let initValue = initialValue;
     return operatorFn
         ? (value) => {
-              initialValue = operatorFn(initialValue, value);
-              return initialValue;
+              initValue = operatorFn(initValue, value);
+              return initValue;
           }
         : () => {
-              return initialValue;
+              return initValue;
           };
 }
 
@@ -82,9 +85,9 @@ function getOperationFn(initialValue, operatorFn) {
  * console.log(generator()); // 7
  * console.log(generator()); // 9
  */
-function sequence(start = 0, step = 1) {
-    this.start = start;
-    this.step = step;
+function sequence(startArg = 0, stepArg = 1) {
+    let start = startArg;
+    let step = stepArg;
     let started = false;
     return function () {
         if (!started) {
@@ -112,26 +115,21 @@ function sequence(start = 0, step = 1) {
  */
 function deepEqual(firstObject, secondObject) {
     // Бессовестно скорпировал со StackOverflow
-    if (firstObject === secondObject) {
-        return true;
-    } else if (
-        typeof firstObject == 'object' &&
-        firstObject != null &&
-        typeof secondObject == 'object' &&
-        secondObject != null
-    ) {
-        if (Object.keys(firstObject).length != Object.keys(secondObject).length)
-            return false;
 
-        for (let prop in firstObject) {
-            if (secondObject.hasOwnProperty(prop)) {
-                if (!deepEqual(firstObject[prop], secondObject[prop]))
-                    return false;
-            } else return false;
-        }
+    if (
+        firstObject !== Object(firstObject) &&
+        secondObject !== Object(secondObject)
+    )
+        return firstObject === secondObject;
 
-        return true;
-    } else return false;
+    if (Object.keys(firstObject).length != Object.keys(secondObject).length)
+        return false;
+
+    for (let prop in firstObject) {
+        if (!secondObject.hasOwnProperty(prop)) return false;
+        if (!deepEqual(firstObject[prop], secondObject[prop])) return false;
+    }
+    return true;
 }
 
 module.exports = {
